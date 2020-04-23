@@ -38,9 +38,6 @@ class DigitalPopup {
 
         // create a geometry
         const geometry = new THREE.BoxBufferGeometry( 2, 2, 2 );
-
-        // create the floor
-        const floor = new THREE.PlaneGeometry( 20, 20, 20, 20 );
         
         // create a Mesh containing the geometry and material
         var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({color:0xffffff, wireframe:USE_WIREFRAME}) );
@@ -52,7 +49,7 @@ class DigitalPopup {
         this.scene.add( mesh );
 
         // create a Mesh containing the geometry and material
-        var meshFloor = new THREE.Mesh( floor, new THREE.MeshPhongMaterial({color:0xffffff, wireframe:USE_WIREFRAME}) );
+        var meshFloor = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 20, 20 ), new THREE.MeshPhongMaterial({color:0xffffff, wireframe:USE_WIREFRAME}) );
 
         // add the mesh to the scene object
         this.scene.add( mesh );
@@ -65,18 +62,18 @@ class DigitalPopup {
         this.scene.add( meshFloor );
         
 
-        const ambientLight = new THREE.AmbientLight( 0xffffff, 0.9);
+        const ambientLight = new THREE.AmbientLight( 0xffffff, 0.90);
         // remember to add the light to the scene
         this.scene.add( ambientLight );
 
         // Create a directional light
-        const light = new THREE.PointLight( 0xffffff, 0.1, 20 );
+        const light = new THREE.PointLight( 0xffffff, 0.1, 40 );
         light.castShadow = true;
         light.shadow.camera.near = 0.1;
-        light.shadow.camera.far = 25;
+        light.shadow.camera.far = 105;
 
         // move the light back and up a bit
-        light.position.set( -6, 6, -6 );
+        light.position.set( -2, 10, -10 );
 
         // remember to add the light to the scene
         this.scene.add( light );
