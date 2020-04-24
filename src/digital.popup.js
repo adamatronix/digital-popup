@@ -1,6 +1,10 @@
 import * as THREE from "three";
-var OrbitControls = require('three-orbit-controls')(THREE);
+import { Water } from 'three/examples/jsm/objects/Water2';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import Block from "./block";
+import waterMap1 from "./Water_1_M_Normal.jpg";
+import waterMap2 from "./Water_2_M_Normal.jpg";
+import "./Water_2_M_Normal.jpg";
 
 
 class DigitalPopup {
@@ -42,6 +46,28 @@ class DigitalPopup {
     
 
         this.addRandomBlocks();
+
+
+        // water
+
+        var waterGeometry = new THREE.PlaneBufferGeometry(  110, 110, 100, 100 );
+        var textureLoader = new THREE.TextureLoader();
+
+        var water = new Water( waterGeometry, {
+            color: "#F2FCFF",
+            scale: 3,
+            flowDirection: new THREE.Vector2( 4, 3 ),
+            textureWidth: 1024,
+            textureHeight: 1024,
+            normalMap0: textureLoader.load( waterMap1 ),
+            normalMap1: textureLoader.load( waterMap2 )
+        } );
+
+        
+
+        water.position.y = 0.5;
+        water.rotation.x = Math.PI * - 0.5;
+        this.scene.add( water );
 
         // create a Mesh containing the geometry and material
         var meshFloor = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 100, 100 ), new THREE.MeshPhongMaterial({color:0xffffff, wireframe:USE_WIREFRAME}) );
@@ -113,8 +139,8 @@ class DigitalPopup {
 
     addRandomBlocks() {
         for(var i = 0; i < 100; i++) {
-            let height = this.random( 1, 11);
-            let base = this.random( 2, 3);
+            let height = this.random( 1, 14);
+            let base = this.random( 2, 5);
             var mesh = new Block({
                 width: base,
                 height: height,
