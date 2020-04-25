@@ -4,7 +4,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import Block from "./block";
 import waterMap1 from "./Water_1_M_Normal.jpg";
 import waterMap2 from "./Water_2_M_Normal.jpg";
-import "./Water_2_M_Normal.jpg";
+import image1 from "./image1.jpg";
+import Product from "./product";
 
 
 class DigitalPopup {
@@ -41,20 +42,26 @@ class DigitalPopup {
         // we'll move the camera back a bit so that we can view the scene
         this.camera.position.set( 0, 0, 10 );
 
-        // create a geometry
-        const geometry = new THREE.BoxBufferGeometry( 2, 4, 2 );
-    
 
         this.addRandomBlocks();
 
+        var productMesh = new Product({
+            width: 20,
+            height: 20,
+            image: image1
+        });
+        productMesh.position.y = 22;
+        productMesh.position.z = -49.9;
+
+        this.scene.add(productMesh);
 
         // water
 
-        var waterGeometry = new THREE.PlaneBufferGeometry(  110, 110, 100, 100 );
+        var waterGeometry = new THREE.PlaneBufferGeometry(  100, 100, 100, 100 );
         var textureLoader = new THREE.TextureLoader();
 
         var water = new Water( waterGeometry, {
-            color: "#F2FCFF",
+            color: "#FFFFFF",
             scale: 3,
             flowDirection: new THREE.Vector2( 4, 3 ),
             textureWidth: 1024,
@@ -138,7 +145,7 @@ class DigitalPopup {
     }
 
     addRandomBlocks() {
-        for(var i = 0; i < 100; i++) {
+        for(var i = 0; i < 10; i++) {
             let height = this.random( 1, 14);
             let base = this.random( 2, 5);
             var mesh = new Block({
