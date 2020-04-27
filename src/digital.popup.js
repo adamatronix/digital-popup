@@ -5,6 +5,7 @@ import Block from "./block";
 import waterMap1 from "./Water_1_M_Normal.jpg";
 import waterMap2 from "./Water_2_M_Normal.jpg";
 import image1 from "./image1.jpg";
+import image2 from "./image2.jpg";
 import Product from "./product";
 
 
@@ -50,10 +51,23 @@ class DigitalPopup {
             height: 20,
             image: image1
         });
-        productMesh.position.y = 22;
+        productMesh.position.y = 10;
         productMesh.position.z = -49.9;
 
         this.scene.add(productMesh);
+
+        var productMesh1 = new Product({
+            width: 20,
+            height: 20,
+            image: image2
+        });
+        productMesh1.position.y = 10;
+        productMesh1.position.x = -49.9;
+        productMesh1.position.z = 0;
+        productMesh1.rotation.y += Math.PI / 2;
+
+
+        this.scene.add(productMesh1);
 
         // water
 
