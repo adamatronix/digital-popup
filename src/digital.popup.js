@@ -57,15 +57,13 @@ class DigitalPopup {
 
         // water
 
-        var waterGeometry = new THREE.PlaneBufferGeometry(  100, 100, 100, 100 );
+        var waterGeometry = new THREE.PlaneBufferGeometry(  100, 100, 10, 10 );
         var textureLoader = new THREE.TextureLoader();
 
         var water = new Water( waterGeometry, {
             color: "#FFFFFF",
             scale: 3,
-            flowDirection: new THREE.Vector2( 4, 3 ),
-            textureWidth: 1024,
-            textureHeight: 1024,
+            flowDirection: new THREE.Vector2( 3, 4 ),
             normalMap0: textureLoader.load( waterMap1 ),
             normalMap1: textureLoader.load( waterMap2 )
         } );
@@ -77,7 +75,7 @@ class DigitalPopup {
         this.scene.add( water );
 
         // create a Mesh containing the geometry and material
-        var meshFloor = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 100, 100 ), new THREE.MeshPhongMaterial({color:0xffffff, wireframe:USE_WIREFRAME}) );
+        var meshFloor = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 10, 10 ), new THREE.MeshPhongMaterial({color:0xffffff, wireframe:USE_WIREFRAME}) );
 
         meshFloor.rotation.x -= Math.PI / 2;
 	   // Floor can have shadows cast onto it
@@ -145,7 +143,7 @@ class DigitalPopup {
     }
 
     addRandomBlocks() {
-        for(var i = 0; i < 10; i++) {
+        for(var i = 0; i < 80; i++) {
             let height = this.random( 1, 14);
             let base = this.random( 2, 5);
             var mesh = new Block({
