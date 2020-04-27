@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import p5 from "p5";
 import { Water } from 'three/examples/jsm/objects/Water2';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import Block from "./block";
@@ -16,6 +17,9 @@ class DigitalPopup {
         this.scene = null;
         this.camera = null;
         this.controls = null;
+        this.p5 = new p5();
+        this.cameraXIncrement = 0;
+        this.cameraYIncrement = 1000;
         this.animate = this.animate.bind(this);
         this.init();
         this.animate();
@@ -25,7 +29,6 @@ class DigitalPopup {
         var USE_WIREFRAME = false;
         // Get a reference to the container element that will hold our scene
         var container = document.querySelector( '#scene-container' );
-
         // create a Scene
         this.scene = new THREE.Scene();
 
@@ -65,8 +68,6 @@ class DigitalPopup {
         productMesh1.position.x = -49.9;
         productMesh1.position.z = 0;
         productMesh1.rotation.y += Math.PI / 2;
-
-
         this.scene.add(productMesh1);
 
         // water
@@ -173,12 +174,26 @@ class DigitalPopup {
         
     }
 
+    getNoiseValues() {
+        let xNoise = this.p5.noise(this.cameraXIncrement);
+        let yNoise = this.p5.noise(this.cameraYIncrement);
+
+        this.cameraXIncrement += 0.001;
+        this.cameraYIncrement += 0.001;
+
+        return {
+            x: xNoise,
+            y: yNoise
+        }
+    }
+
     animate() {
 
         // call animate recursively
         requestAnimationFrame( this.animate );
         
         this.controls.update();
+        
         // render, or 'create a still image', of the scene
         // this will create one still image / frame each time the animate
         // function calls itself
