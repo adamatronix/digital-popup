@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import p5 from "p5";
 import { Water } from 'three/examples/jsm/objects/Water2';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import Block from "./block";
@@ -16,6 +17,10 @@ class DigitalPopup {
         this.scene = null;
         this.camera = null;
         this.controls = null;
+        this.p5 = new p5();
+        this.cameraXIncrement = 0;
+        this.cameraYIncrement = 1000;
+        this.cameraZIncrement = 2000;
         this.animate = this.animate.bind(this);
         this.init();
         this.animate();
@@ -25,7 +30,6 @@ class DigitalPopup {
         var USE_WIREFRAME = false;
         // Get a reference to the container element that will hold our scene
         var container = document.querySelector( '#scene-container' );
-
         // create a Scene
         this.scene = new THREE.Scene();
 
@@ -41,7 +45,8 @@ class DigitalPopup {
 
         // every object is initially created at ( 0, 0, 0 )
         // we'll move the camera back a bit so that we can view the scene
-        this.camera.position.set( 0, 0, 10 );
+        this.camera.position.set( 0, 20, 0 );
+        this.camera.lookAt(new THREE.Vector3(0,10,-40));
 
 
         this.addRandomBlocks();
@@ -65,8 +70,6 @@ class DigitalPopup {
         productMesh1.position.x = -49.9;
         productMesh1.position.z = 0;
         productMesh1.rotation.y += Math.PI / 2;
-
-
         this.scene.add(productMesh1);
 
         // water
@@ -75,9 +78,9 @@ class DigitalPopup {
         var textureLoader = new THREE.TextureLoader();
 
         var water = new Water( waterGeometry, {
-            color: "#FFFFFF",
-            scale: 3,
-            flowDirection: new THREE.Vector2( 3, 4 ),
+            color: "#FFEFE5",
+            scale: 1,
+            flowDirection: new THREE.Vector2( 1, 1 ),
             normalMap0: textureLoader.load( waterMap1 ),
             normalMap1: textureLoader.load( waterMap2 )
         } );
@@ -153,7 +156,7 @@ class DigitalPopup {
         // add the automatically created <canvas> element to the page
         container.appendChild( this.renderer.domElement );
 
-        this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+        //this.controls = new OrbitControls( this.camera, this.renderer.domElement );
     }
 
     addRandomBlocks() {
@@ -173,12 +176,33 @@ class DigitalPopup {
         
     }
 
+    getNoiseValues() {
+        let xNoise = this.p5.noise(this.cameraXIncrement);
+        let yNoise = this.p5.noise(this.cameraYIncrement);
+        let zNoise = this.p5.noise(this.cameraZIncrement);
+
+        this.cameraXIncrement += 0.002;
+        this.cameraYIncrement += 0.002;
+        this.cameraZIncrement += 0.002;
+
+        return {
+            x: xNoise,
+            y: yNoise,
+            z: zNoise
+        }
+    }
+
+    updateCamera() {
+        let noise = this.getNoiseValues();
+        this.camera.lookAt(new THREE.Vector3((noise.x - 0.5) * (20*2),noise.y*20,(noise.z * 0.5) * -100 ));
+    }
+
     animate() {
 
         // call animate recursively
         requestAnimationFrame( this.animate );
+        this.updateCamera();
         
-        this.controls.update();
         // render, or 'create a still image', of the scene
         // this will create one still image / frame each time the animate
         // function calls itself
