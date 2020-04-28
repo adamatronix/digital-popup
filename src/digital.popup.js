@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import p5 from "p5";
 import { Water } from 'three/examples/jsm/objects/Water2';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import NaturalMovementControls from './NaturalMovementControls';
 import Block from "./block";
 import waterMap1 from "./Water_1_M_Normal.jpg";
 import waterMap2 from "./Water_2_M_Normal.jpg";
@@ -46,9 +46,10 @@ class DigitalPopup {
         // every object is initially created at ( 0, 0, 0 )
         // we'll move the camera back a bit so that we can view the scene
         this.camera.position.set( 0, 20, 0 );
-        this.camera.lookAt(new THREE.Vector3(0,10,-40));
+        this.camera.lookAt(new THREE.Vector3(0,20,-40));
 
-
+        this.camControls = new NaturalMovementControls(this.camera);
+        this.camControls.movementSpeed = 6;
         this.addRandomBlocks();
 
         var productMesh = new Product({
@@ -201,7 +202,8 @@ class DigitalPopup {
 
         // call animate recursively
         requestAnimationFrame( this.animate );
-        this.updateCamera();
+        //this.updateCamera();
+        this.camControls.update();
         
         // render, or 'create a still image', of the scene
         // this will create one still image / frame each time the animate
