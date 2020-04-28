@@ -21,6 +21,9 @@ class DigitalPopup {
         this.cameraXIncrement = 0;
         this.cameraYIncrement = 1000;
         this.cameraZIncrement = 2000;
+        this.onInstructionsClick = this.onInstructionsClick.bind(this);
+        this.onInstructionsLock = this.onInstructionsLock.bind(this);
+        this.onInstructionsUnlock = this.onInstructionsUnlock.bind(this);
         this.animate = this.animate.bind(this);
         this.init();
         this.animate();
@@ -30,6 +33,8 @@ class DigitalPopup {
         var USE_WIREFRAME = false;
         // Get a reference to the container element that will hold our scene
         var container = document.querySelector( '#scene-container' );
+        this.instructions = document.querySelector( '#instructions' );
+        this.instructions.addEventListener("click", this.onInstructionsClick);
         // create a Scene
         this.scene = new THREE.Scene();
 
@@ -50,6 +55,10 @@ class DigitalPopup {
 
         this.camControls = new NaturalMovementControls(this.camera);
         this.camControls.movementSpeed = 6;
+
+        this.camControls.addEventListener( 'lock', this.onInstructionsLock );
+
+        this.camControls.addEventListener( 'unlock', this.onInstructionsUnlock);
         this.addRandomBlocks();
 
         var productMesh = new Product({
@@ -158,6 +167,18 @@ class DigitalPopup {
         container.appendChild( this.renderer.domElement );
 
         //this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+    }
+
+    onInstructionsClick() {
+        this.camControls.lock();
+    }
+
+    onInstructionsLock() {
+        this.instructions.style.display = "none";
+    }
+
+    onInstructionsUnlock() {
+        this.instructions.style.display = "block";
     }
 
     addRandomBlocks() {
