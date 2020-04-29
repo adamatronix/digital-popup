@@ -223,8 +223,8 @@ class DigitalPopup {
 
         // call animate recursively
         requestAnimationFrame( this.animate );
-        //this.updateCamera();
         this.camControls.update();
+        
         
         // render, or 'create a still image', of the scene
         // this will create one still image / frame each time the animate

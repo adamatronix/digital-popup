@@ -10,6 +10,8 @@ class NaturalMovementControls {
 
     constructor(object, domElement) {
 
+        this.p5 = new p5();
+
         if ( domElement === undefined ) {
             console.warn( 'THREE.FirstPersonControls: The second parameter "domElement" is now mandatory.' );
             this.domElement = document.body;
@@ -19,7 +21,22 @@ class NaturalMovementControls {
         this.object = object;
         this.euler = new Euler( 0, 0, 0, 'YXZ' );
         this.PI_2 = Math.PI / 2;
+        this.velocity = new THREE.Vector3();
+        this.vec = new Vector3();
+        this.direction = new Vector3();
         this.isLocked = false; 
+        this.prevTime = performance.now();
+
+        this.dummyObject = new THREE.Object3D();
+
+        this.moveForward = false;
+        this.moveBackward = false;
+        this.moveLeft = false;
+        this.moveRight = false;
+
+        this.cameraXIncrement = 0;
+        this.cameraYIncrement = 1000;
+        this.cameraZIncrement = 2000;
 
         this.lockEvent = { type: 'lock' };
 	    this.unlockEvent = { type: 'unlock' };
@@ -48,13 +65,14 @@ class NaturalMovementControls {
 		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 		var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-		this.euler.setFromQuaternion( this.object.quaternion );
+		this.euler.setFromQuaternion( this.dummyObject.quaternion );
 
 		this.euler.y -= movementX * 0.002;
 		this.euler.x -= movementY * 0.002;
 
-		this.euler.x = Math.max( - this.PI_2, Math.min( this.PI_2, this.euler.x ) );
-		this.object.quaternion.setFromEuler( this.euler );
+        this.euler.x = Math.max( - this.PI_2, Math.min( this.PI_2, this.euler.x ) );
+        this.dummyObject.quaternion.setFromEuler( this.euler );
+          
     }
 
     onPointerlockChange() {
@@ -82,6 +100,33 @@ class NaturalMovementControls {
 
 	unlock() {
 		document.exitPointerLock();
+    }
+
+    getObject() { // retaining this method for backward compatibility
+
+		return this.object;
+
+	};
+    
+    moveForwardAction( distance ) {
+
+		// move forward parallel to the xz-plane
+		// assumes camera.up is y-up
+
+		this.vec.setFromMatrixColumn( this.object.matrix, 0 );
+
+		this.vec.crossVectors( this.object.up, this.vec );
+
+		this.object.position.addScaledVector( this.vec, distance );
+
+    }
+    
+    moveRightAction( distance ) {
+
+		this.vec.setFromMatrixColumn( this.object.matrix, 0 );
+
+		this.object.position.addScaledVector( this.vec, distance );
+
 	}
 
     onKeyDown( event ) {
@@ -130,8 +175,56 @@ class NaturalMovementControls {
 		}
 
     }
+
+    getNoiseValues() {
+        let xNoise = this.p5.noise(this.cameraXIncrement);
+        let yNoise = this.p5.noise(this.cameraYIncrement);
+        let zNoise = this.p5.noise(this.cameraZIncrement);
+
+        this.cameraXIncrement += 0.006;
+        this.cameraYIncrement += 0.006;
+        this.cameraZIncrement += 0.006;
+
+        return {
+            x: xNoise,
+            y: yNoise,
+            z: zNoise
+        }
+    }
     
     update() {
+        if ( this.isLocked === true ) {
+            let noise = this.getNoiseValues();
+            this.object.quaternion.setFromEuler( new Euler( this.euler.x + ((1 - (noise.x * 2)) * 0.2), this.euler.y + ((1 - (noise.y * 2)) * 0.2), this.euler.z + ((1 - (noise.z * 2)) * 0.2), 'YXZ' ) );  
+            let time = performance.now();0
+            let delta = ( time - this.prevTime ) / 1000;
+
+            this.velocity.x -= this.velocity.x * 10.0 * delta;
+            this.velocity.z -= this.velocity.z * 10.0 * delta;
+            this.velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
+            
+            this.direction.z = Number( this.moveForward ) - Number( this.moveBackward );
+            this.direction.x = Number( this.moveRight ) - Number( this.moveLeft );
+            this.direction.normalize(); // this ensures consistent movements in all directions
+
+            if ( this.moveForward || this.moveBackward ) this.velocity.z -= this.direction.z * 100.0 * delta;
+            if ( this.moveLeft || this.moveRight ) this.velocity.x -= this.direction.x * 100.0 * delta;
+            this.moveRightAction( - this.velocity.x * delta );
+            this.moveForwardAction( - this.velocity.z * delta );
+            
+            this.object.position.y += ( this.velocity.y * delta ); // new behavior
+
+            if ( this.object.position.y < 10 ) {
+
+                this.velocity.y = 0;
+                this.object.position.y = 10;
+
+            }
+            
+            this.prevTime = time;
+        }
+
+        
        /* let delta = this.clock.getDelta();
         let actualMoveSpeed = delta * this.movementSpeed;
 
