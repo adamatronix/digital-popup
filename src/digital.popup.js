@@ -18,9 +18,12 @@ class DigitalPopup {
         this.camera = null;
         this.controls = null;
         this.p5 = new p5();
+        this.blocks = [];
+        this.PLAYERCOLLISIONDISTANCE = 10;
         this.cameraXIncrement = 0;
         this.cameraYIncrement = 1000;
         this.cameraZIncrement = 2000;
+        this.onDocumentMouseMove = this.onDocumentMouseMove.bind(this);
         this.onInstructionsClick = this.onInstructionsClick.bind(this);
         this.onInstructionsLock = this.onInstructionsLock.bind(this);
         this.onInstructionsUnlock = this.onInstructionsUnlock.bind(this);
@@ -31,6 +34,9 @@ class DigitalPopup {
 
     init() {
         var USE_WIREFRAME = false;
+        this.mouse = new THREE.Vector2();
+        this.direction = new THREE.Vector3();
+        this.INTERSECTED = null;
         // Get a reference to the container element that will hold our scene
         var container = document.querySelector( '#scene-container' );
         this.instructions = document.querySelector( '#instructions' );
@@ -47,6 +53,9 @@ class DigitalPopup {
         const far = 300;
 
         this.camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
+
+        this.raycaster = new THREE.Raycaster();
+        document.addEventListener( 'mousemove', this.onDocumentMouseMove, false );
 
         // every object is initially created at ( 0, 0, 0 )
         // we'll move the camera back a bit so that we can view the scene
@@ -181,6 +190,15 @@ class DigitalPopup {
         this.instructions.style.display = "block";
     }
 
+    onDocumentMouseMove( event ) {
+
+        event.preventDefault();
+
+        this.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+        this.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+    }
+
     addRandomBlocks() {
         for(var i = 0; i < 80; i++) {
             let height = this.random( 1, 14);
@@ -193,6 +211,7 @@ class DigitalPopup {
                 y: height/2,
                 z: this.random( -40, 40)
             });
+            this.blocks.push(mesh);
             this.scene.add( mesh );
         }
         
@@ -219,13 +238,66 @@ class DigitalPopup {
         this.camera.lookAt(new THREE.Vector3((noise.x - 0.5) * (20*2),noise.y*20,(noise.z * 0.5) * -100 ));
     }
 
+    detectPlayerCollision() {
+        // The rotation matrix to apply to our direction vector
+        // Undefined by default to indicate ray should coming from front
+        var rotationMatrix;
+        // Get direction of camera
+        var cameraDirection = this.camControls.getDirection(new THREE.Vector3(0, 0, 0));
+    
+        // Check which direction we're moving (not looking)
+        // Flip matrix to that direction so that we can reposition the ray
+        if (this.camControls.moveBackward) {
+            rotationMatrix = new THREE.Matrix4();
+            rotationMatrix.makeRotationY(this.degreesToRadians(180));
+        }
+        else if (this.camControls.moveLeft) {
+            rotationMatrix = new THREE.Matrix4();
+            rotationMatrix.makeRotationY(this.degreesToRadians(90));
+        }
+        else if (this.camControls.moveRight) {
+            rotationMatrix = new THREE.Matrix4();
+            rotationMatrix.makeRotationY(this.degreesToRadians(270));
+        }
+    
+        // Player is not moving forward, apply rotation matrix needed
+        if (rotationMatrix !== undefined) {
+            cameraDirection.applyMatrix4(rotationMatrix);
+        }
+    
+        // Apply ray to player camera
+        var rayCaster = new THREE.Raycaster(this.camera.position, cameraDirection);
+    
+        // If our ray hit a collidable object, return true
+        if (this.rayIntersect(rayCaster, this.PLAYERCOLLISIONDISTANCE)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    rayIntersect(ray, distance) {
+        var intersects = ray.intersectObjects(this.blocks);
+        for (var i = 0; i < intersects.length; i++) {
+            // Check if there's a collision
+            if (intersects[i].distance < distance) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    degreesToRadians(degrees) {
+        return degrees * Math.PI / 180;
+    }
+
     animate() {
 
         // call animate recursively
         requestAnimationFrame( this.animate );
         this.camControls.update();
-        
-        
+        console.log(this.detectPlayerCollision());
+    
         // render, or 'create a still image', of the scene
         // this will create one still image / frame each time the animate
         // function calls itself

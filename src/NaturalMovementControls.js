@@ -176,6 +176,18 @@ class NaturalMovementControls {
 
     }
 
+    getDirection() {
+
+		var direction = new Vector3( 0, 0, - 1 );
+
+		return function ( v ) {
+
+			return v.copy( direction ).applyQuaternion( this.dummyObject.quaternion );
+
+		};
+
+	}
+
     getNoiseValues() {
         let xNoise = this.p5.noise(this.cameraXIncrement);
         let yNoise = this.p5.noise(this.cameraYIncrement);
