@@ -70,6 +70,7 @@ class DigitalPopup {
 
         this.camControls.addEventListener( 'unlock', this.onInstructionsUnlock);
         //this.addRandomBlocks();
+        this.addPillars();
 
 
         var ceilLight = new THREE.Mesh( new THREE.PlaneGeometry( 10, 10, 4, 4 ), new THREE.MeshStandardMaterial({
@@ -173,19 +174,19 @@ class DigitalPopup {
 	    meshWall4.receiveShadow = true;
         this.scene.add( meshWall4 );
 
-        const ambientLight = new THREE.AmbientLight( 0xffffff, 0.85);
+        const ambientLight = new THREE.AmbientLight( 0xffffff, 0.9);
         // remember to add the light to the scene
         this.scene.add( ambientLight );
 
         // Create a directional light
-        const light = new THREE.PointLight( 0xffffff, 0.15, 120 );
+        const light = new THREE.PointLight( 0xffffff, 0.2, 120 );
         light.castShadow = true;
         light.shadow.camera.near = 0.1;
         light.shadow.camera.far = 300;
         light.shadow.mapSize.width = 1024;
         light.shadow.mapSize.height = 1024;
         // move the light back and up a bit
-        light.position.set( 0, 60, -10 );
+        light.position.set( 0, 60, -30 );
 
         // remember to add the light to the scene
         this.scene.add( light );
@@ -243,6 +244,27 @@ class DigitalPopup {
             this.scene.add( mesh );
         }
         
+    }
+
+    addPillars() {
+        var geometryCylinder = new THREE.CylinderBufferGeometry( 2, 2, 40, 32 );
+        var materialCylinder = new THREE.MeshPhongMaterial( {color: 0xffffff} );
+        var cylinder = new THREE.Mesh( geometryCylinder, materialCylinder );
+        cylinder.receiveShadow = true;
+        cylinder.castShadow = true;
+        cylinder.position.y = 20;
+        cylinder.position.x = 35;
+        cylinder.position.z = 35;
+
+        var cylinder2 = new THREE.Mesh( geometryCylinder, materialCylinder );
+        cylinder2.receiveShadow = true;
+        cylinder2.castShadow = true;
+        cylinder2.position.y = 20;
+        cylinder2.position.x = -35;
+        cylinder2.position.z = -35;
+
+        this.scene.add(cylinder);
+        this.scene.add(cylinder2);
     }
 
     getNoiseValues() {
