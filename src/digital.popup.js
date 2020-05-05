@@ -93,7 +93,7 @@ class DigitalPopup {
 
         // water
 
-        var waterGeometry = new THREE.PlaneBufferGeometry(  100, 100, 10, 10 );
+        var waterGeometry = new THREE.PlaneBufferGeometry(  100, 100, 4, 4 );
         var textureLoader = new THREE.TextureLoader();
 
         var water = new Water( waterGeometry, {
@@ -111,7 +111,7 @@ class DigitalPopup {
         this.scene.add( water );
 
         // create a Mesh containing the geometry and material
-        var meshFloor = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 10, 10 ), new THREE.MeshPhongMaterial({color:0xffffff, wireframe:USE_WIREFRAME}) );
+        var meshFloor = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), new THREE.MeshPhongMaterial({color:0xffffff, wireframe:USE_WIREFRAME}) );
 
         meshFloor.rotation.x -= Math.PI / 2;
 	   // Floor can have shadows cast onto it
