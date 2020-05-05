@@ -3,6 +3,7 @@ import p5 from "p5";
 import { Water } from 'three/examples/jsm/objects/Water2';
 import NaturalMovementControls from './NaturalMovementControls';
 import Block from "./block";
+import NoiseWall from './NoiseWall';
 import waterMap1 from "./Water_1_M_Normal.jpg";
 import waterMap2 from "./Water_2_M_Normal.jpg";
 import image1 from "./image1.jpg";
@@ -76,7 +77,7 @@ class DigitalPopup {
             image: image1
         });
         productMesh.position.y = 10;
-        productMesh.position.z = -49.9;
+        productMesh.position.z = -48;
 
         this.scene.add(productMesh);
 
@@ -86,7 +87,7 @@ class DigitalPopup {
             image: image2
         });
         productMesh1.position.y = 10;
-        productMesh1.position.x = -49.9;
+        productMesh1.position.x = -48;
         productMesh1.position.z = 0;
         productMesh1.rotation.y += Math.PI / 2;
         this.scene.add(productMesh1);
@@ -118,12 +119,18 @@ class DigitalPopup {
 	    meshFloor.receiveShadow = true;
         // add the mesh to the scene object
         this.scene.add( meshFloor );
+
+        this.meshWall1 = new NoiseWall({
+            width: 100,
+            height: 40,
+            widthDiv: 100,
+            heightDiv: 100,
+            enabled: false
+        });
     
-        var meshWall1 = new THREE.Mesh( new THREE.PlaneGeometry( 100, 40, 20, 20 ), new THREE.MeshPhongMaterial({color:0xffffff, side: THREE.DoubleSide, wireframe:USE_WIREFRAME}) );
-        meshWall1.position.z = -50;
-        meshWall1.position.y = 20;
-	    meshWall1.receiveShadow = true;
-        this.scene.add( meshWall1 );
+        this.meshWall1.mesh.position.z = -50;
+        this.meshWall1.mesh.position.y = 20;
+        this.scene.add( this.meshWall1.mesh );
 
         var meshWall2 = new THREE.Mesh( new THREE.PlaneGeometry( 100, 40, 20, 20 ), new THREE.MeshPhongMaterial({color:0xffffff, wireframe:USE_WIREFRAME, side: THREE.DoubleSide}) );
         meshWall2.position.z = 50;
@@ -296,6 +303,7 @@ class DigitalPopup {
         // call animate recursively
         requestAnimationFrame( this.animate );
         this.camControls.update();
+        this.meshWall1.update();
         //console.log(this.detectPlayerCollision());
     
         // render, or 'create a still image', of the scene
