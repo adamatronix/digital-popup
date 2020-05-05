@@ -69,7 +69,18 @@ class DigitalPopup {
         this.camControls.addEventListener( 'lock', this.onInstructionsLock );
 
         this.camControls.addEventListener( 'unlock', this.onInstructionsUnlock);
-        this.addRandomBlocks();
+        //this.addRandomBlocks();
+
+
+        var ceilLight = new THREE.Mesh( new THREE.PlaneGeometry( 10, 10, 4, 4 ), new THREE.MeshStandardMaterial({
+            emissive: 0xffffff,
+            emissiveIntensity: 1,
+            side: THREE.DoubleSide,
+            color: 0xE83100
+          }) );
+        ceilLight.position.y = 39;
+        ceilLight.rotation.x += Math.PI / 2;
+        this.scene.add(ceilLight);
 
         var productMesh = new Product({
             width: 20,
@@ -98,8 +109,8 @@ class DigitalPopup {
         var textureLoader = new THREE.TextureLoader();
 
         var water = new Water( waterGeometry, {
-            color: "#FFEFE5",
-            scale: 1,
+            color: "#FAFCFF",
+            scale: 4,
             flowDirection: new THREE.Vector2( 1, 1 ),
             normalMap0: textureLoader.load( waterMap1 ),
             normalMap1: textureLoader.load( waterMap2 )
@@ -119,6 +130,16 @@ class DigitalPopup {
 	    meshFloor.receiveShadow = true;
         // add the mesh to the scene object
         this.scene.add( meshFloor );
+
+        var meshCeil = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), new THREE.MeshPhongMaterial({color:0xffffff}) );
+
+        meshCeil.rotation.x += Math.PI / 2;
+
+        meshCeil.position.y = 40;
+	   // Floor can have shadows cast onto it
+	    meshCeil.receiveShadow = true;
+        // add the mesh to the scene object
+        this.scene.add( meshCeil );
 
         this.meshWall1 = new NoiseWall({
             width: 100,
@@ -303,7 +324,7 @@ class DigitalPopup {
         // call animate recursively
         requestAnimationFrame( this.animate );
         this.camControls.update();
-        this.meshWall1.update();
+        //this.meshWall1.update();
         //console.log(this.detectPlayerCollision());
     
         // render, or 'create a still image', of the scene
