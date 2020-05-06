@@ -1,11 +1,15 @@
 import * as THREE from "three";
 import p5 from "p5";
 import { Water } from 'three/examples/jsm/objects/Water2';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import NaturalMovementControls from './NaturalMovementControls';
 import Block from "./block";
 import NoiseWall from './NoiseWall';
+import NoiseSphere from './NoiseSphere';
 import waterMap1 from "./Water_1_M_Normal.jpg";
 import waterMap2 from "./Water_2_M_Normal.jpg";
+import shirt from "./Tshirt_obj.obj";
+import raptor from "./raptor_01.obj";
 import image1 from "./image1.jpg";
 import image2 from "./image2.jpg";
 import Product from "./product";
@@ -53,6 +57,63 @@ class DigitalPopup {
         const near = 0.1;
         const far = 300;
 
+        this.loader = new OBJLoader();
+
+        var self = this;
+
+        var shirtMat = new THREE.MeshPhongMaterial({color:0xffffff, side: THREE.DoubleSide});
+        // load a resource  
+        this.loader.load(
+            // resource URL
+            shirt,
+            // called when resource is loaded
+            function ( object ) {
+                object.scale.set(0.09,0.09,0.09);
+                object.position.set(0,1,-30);
+                object.traverse(function(child){child.castShadow = true; child.receiveShadow = true; child.material = shirtMat});
+                self.scene.add( object );
+
+            },
+            // called when loading is in progresses
+            function ( xhr ) {
+
+                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+            },
+            // called when loading has errors
+            function ( error ) {
+
+                console.log( 'An error happened' );
+
+            }
+        );
+
+        this.loader2 = new OBJLoader();
+        this.loader2.load(
+            // resource URL
+            raptor,
+            // called when resource is loaded
+            function ( object ) {
+                object.scale.set(20,20,20);
+                object.position.set(-30,0,-20);
+                object.traverse(function(child){child.castShadow = true; child.receiveShadow = true; child.material = shirtMat});
+                self.scene.add( object );
+
+            },
+            // called when loading is in progresses
+            function ( xhr ) {
+
+                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+            },
+            // called when loading has errors
+            function ( error ) {
+
+                console.log( 'An error happened' );
+
+            }
+        );
+
         this.camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
 
         this.raycaster = new THREE.Raycaster();
@@ -69,7 +130,7 @@ class DigitalPopup {
         this.camControls.addEventListener( 'lock', this.onInstructionsLock );
 
         this.camControls.addEventListener( 'unlock', this.onInstructionsUnlock);
-        //this.addRandomBlocks();
+        this.addRandomBlocks();
         this.addPillars();
 
 
@@ -88,7 +149,7 @@ class DigitalPopup {
             height: 20,
             image: image1
         });
-        productMesh.position.y = 10;
+        productMesh.position.y = 15;
         productMesh.position.z = -48;
 
         this.scene.add(productMesh);
@@ -98,7 +159,7 @@ class DigitalPopup {
             height: 20,
             image: image2
         });
-        productMesh1.position.y = 10;
+        productMesh1.position.y = 15;
         productMesh1.position.x = -48;
         productMesh1.position.z = 0;
         productMesh1.rotation.y += Math.PI / 2;
@@ -109,7 +170,7 @@ class DigitalPopup {
         var waterGeometry = new THREE.PlaneBufferGeometry(  100, 100, 4, 4 );
         var textureLoader = new THREE.TextureLoader();
 
-        var water = new Water( waterGeometry, {
+        this.water = new Water( waterGeometry, {
             color: "#FAFCFF",
             scale: 4,
             flowDirection: new THREE.Vector2( 1, 1 ),
@@ -119,9 +180,9 @@ class DigitalPopup {
 
         
 
-        water.position.y = 0.5;
-        water.rotation.x = Math.PI * - 0.5;
-        this.scene.add( water );
+        this.water.position.y = -0.5;
+        this.water.rotation.x = Math.PI * - 0.5;
+        this.scene.add( this.water );
 
         // create a Mesh containing the geometry and material
         var meshFloor = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), new THREE.MeshPhongMaterial({color:0xffffff, wireframe:USE_WIREFRAME}) );
@@ -145,9 +206,9 @@ class DigitalPopup {
         this.meshWall1 = new NoiseWall({
             width: 100,
             height: 40,
-            widthDiv: 100,
-            heightDiv: 100,
-            enabled: false
+            widthDiv: 50,
+            heightDiv: 50,
+            enabled: true
         });
     
         this.meshWall1.mesh.position.z = -50;
@@ -174,22 +235,22 @@ class DigitalPopup {
 	    meshWall4.receiveShadow = true;
         this.scene.add( meshWall4 );
 
-        const ambientLight = new THREE.AmbientLight( 0xffffff, 0.9);
+        const ambientLight = new THREE.AmbientLight( 0xffffff, 0.92);
         // remember to add the light to the scene
         this.scene.add( ambientLight );
 
         // Create a directional light
-        const light = new THREE.PointLight( 0xffffff, 0.2, 120 );
-        light.castShadow = true;
-        light.shadow.camera.near = 0.1;
-        light.shadow.camera.far = 300;
-        light.shadow.mapSize.width = 1024;
-        light.shadow.mapSize.height = 1024;
+        this.light = new THREE.PointLight( 0xffffff, 0.3, 120 );
+        this.light.castShadow = true;
+        this.light.shadow.camera.near = 0.1;
+        this.light.shadow.camera.far = 300;
+        this.light.shadow.mapSize.width = 1024;
+        this.light.shadow.mapSize.height = 1024;
         // move the light back and up a bit
-        light.position.set( 0, 60, -30 );
+        this.light.position.set( 0, 60, -30 );
 
         // remember to add the light to the scene
-        this.scene.add( light );
+        this.scene.add( this.light );
 
         // create a WebGLRenderer and set its width and height
         this.renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -229,8 +290,8 @@ class DigitalPopup {
     }
 
     addRandomBlocks() {
-        for(var i = 0; i < 80; i++) {
-            let height = this.random( 1, 14);
+        for(var i = 0; i < 50; i++) {
+            let height = this.random( 1, 10);
             let base = this.random( 2, 5);
             var mesh = new Block({
                 width: base,
@@ -346,7 +407,16 @@ class DigitalPopup {
         // call animate recursively
         requestAnimationFrame( this.animate );
         this.camControls.update();
-        //this.meshWall1.update();
+        this.meshWall1.update();
+        
+        this.water.position.y = (Math.abs(this.camera.position.x + this.camera.position.z)/6) - 0.5;
+        if(this.water.position.y > 3) {
+            this.water.position.y = 3;
+        }
+
+        this.light.position.z = -30 + (2 * this.camera.position.z);
+        this.light.position.x = 0 + (2 * this.camera.position.x);
+    
         //console.log(this.detectPlayerCollision());
     
         // render, or 'create a still image', of the scene

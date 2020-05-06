@@ -10,6 +10,8 @@ class NoiseWall {
         this.mesh = this.createMesh();
         this.vertices = this.mesh.geometry.attributes.position.array;
         this.increment = 0;
+        this.violence = 0.09;
+        this.peak = 2;
     }
 
     createMesh() {
@@ -22,15 +24,14 @@ class NoiseWall {
 
     update() {
         if(this.options.enabled) {
-            let peak = 2;
             for (var i = 0; i <= this.vertices.length; i += 3) {
-                this.vertices[i+2] = peak * this.p5.noise(
+                this.vertices[i+2] = this.peak * this.p5.noise(
                     this.vertices[i] + this.increment, 
                     this.vertices[i+1] + this.increment
                 );
             }
 
-            this.increment += 0.007;
+            this.increment += this.violence;
             this.mesh.geometry.attributes.position.needsUpdate = true;
             this.mesh.geometry.computeVertexNormals();
         }
