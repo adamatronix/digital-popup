@@ -2,6 +2,7 @@ import * as THREE from "three";
 import p5 from "p5";
 import { Water } from 'three/examples/jsm/objects/Water2';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 import NaturalMovementControls from './NaturalMovementControls';
 import Block from "./block";
 import NoiseWall from './NoiseWall';
@@ -38,6 +39,10 @@ class DigitalPopup {
     }
 
     init() {
+        this.stats = new Stats();
+        this.stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+        document.body.appendChild( this.stats.dom );
+
         var USE_WIREFRAME = false;
         this.mouse = new THREE.Vector2();
         this.direction = new THREE.Vector3();
@@ -70,7 +75,7 @@ class DigitalPopup {
             function ( object ) {
                 object.scale.set(0.09,0.09,0.09);
                 object.position.set(0,1,-30);
-                object.traverse(function(child){child.castShadow = true; child.receiveShadow = true; child.material = shirtMat});
+                object.traverse(function(child){child.castShadow = true; child.material = shirtMat});
                 self.scene.add( object );
 
             },
@@ -96,7 +101,7 @@ class DigitalPopup {
             function ( object ) {
                 object.scale.set(20,20,20);
                 object.position.set(-30,0,-20);
-                object.traverse(function(child){child.castShadow = true; child.receiveShadow = true; child.material = shirtMat});
+                object.traverse(function(child){child.castShadow = true; child.material = shirtMat});
                 self.scene.add( object );
 
             },
@@ -240,7 +245,7 @@ class DigitalPopup {
         this.scene.add( ambientLight );
 
         // Create a directional light
-        this.light = new THREE.PointLight( 0xffffff, 0.3, 120 );
+        this.light = new THREE.PointLight( 0xffffff, 0.2, 120 );
         this.light.castShadow = true;
         this.light.shadow.camera.near = 0.1;
         this.light.shadow.camera.far = 300;
@@ -260,7 +265,7 @@ class DigitalPopup {
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-        this.renderer.setPixelRatio( window.devicePixelRatio );
+        //this.renderer.setPixelRatio( window.devicePixelRatio );
 
         // add the automatically created <canvas> element to the page
         container.appendChild( this.renderer.domElement );
@@ -406,16 +411,9 @@ class DigitalPopup {
 
         // call animate recursively
         requestAnimationFrame( this.animate );
+        this.stats.begin();
         this.camControls.update();
         this.meshWall1.update();
-        
-        this.water.position.y = (Math.abs(this.camera.position.x + this.camera.position.z)/6) - 0.5;
-        if(this.water.position.y > 3) {
-            this.water.position.y = 3;
-        }
-
-        this.light.position.z = -30 + (2 * this.camera.position.z);
-        this.light.position.x = 0 + (2 * this.camera.position.x);
     
         //console.log(this.detectPlayerCollision());
     
@@ -423,6 +421,7 @@ class DigitalPopup {
         // this will create one still image / frame each time the animate
         // function calls itself
         this.renderer.render( this.scene, this.camera );
+        this.stats.end();
       
     }
 
