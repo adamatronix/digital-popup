@@ -56,6 +56,8 @@ class DigitalPopup {
 
         this.scene.background = new THREE.Color( 0xFFFFFF );
 
+        this.sphere = new NoiseSphere({ scene: this.scene });
+
         // set up the options for a perspective camera
         const fov = 35; // fov = Field Of View
         const aspect = container.clientWidth / container.clientHeight;
@@ -185,7 +187,7 @@ class DigitalPopup {
 
         
 
-        this.water.position.y = -0.5;
+        this.water.position.y = 1;
         this.water.rotation.x = Math.PI * - 0.5;
         this.scene.add( this.water );
 
@@ -245,6 +247,7 @@ class DigitalPopup {
         this.scene.add( ambientLight );
 
         // Create a directional light
+        
         this.light = new THREE.PointLight( 0xffffff, 0.2, 120 );
         this.light.castShadow = true;
         this.light.shadow.camera.near = 0.1;
@@ -414,6 +417,7 @@ class DigitalPopup {
         this.stats.begin();
         this.camControls.update();
         this.meshWall1.update();
+        this.sphere.update();
     
         //console.log(this.detectPlayerCollision());
     
