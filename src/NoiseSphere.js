@@ -9,12 +9,9 @@ class NoiseSphere {
         this.scene = this.options.scene;
         this.p5 = new p5();
         this.mesh = this.createMesh();
-        this.increment = 0;
+        this.increment = Math.floor(Math.random() * (1000 - 0) + 0);
         this.circle = new THREE.Object3D();
         this.circle.add(this.mesh);
-        
-        this.scene.add(this.circle);
-        this.circle.position.set( 0, 3, 0);
         //this.setLights();
 
         this.vertices = this.mesh.geometry.attributes.position.array;
@@ -26,10 +23,10 @@ class NoiseSphere {
 
     createMesh() {
         
-        const geometry = new THREE.IcosahedronBufferGeometry(1, 3);
+        const geometry = new THREE.IcosahedronBufferGeometry(this.options.size, this.options.detail);
         // create a Mesh containing the geometry and material
-        this.mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color: 0xffffff, side: THREE.DoubleSide} ));
-        //this.mesh.receiveShadow = true;
+        this.mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color: this.options.color, side: THREE.DoubleSide, shading: THREE.FlatShading} ));
+        this.mesh.receiveShadow = true;
         this.mesh.castShadow = true;
 
         return this.mesh;
@@ -51,15 +48,18 @@ class NoiseSphere {
 
 
     update() {
+
+        var smoothing = 3;
+
         for (var i = 0; i <= this.vertices.length; i += 3) {
 
-            this.vertices[i] = this.verticesOrig[i] + (1 - (this.p5.noise(this.verticesOrig[i] + this.increment) * 2));
-            this.vertices[i+1] = this.verticesOrig[i+1] + (1 - (this.p5.noise(this.verticesOrig[i+1] + this.increment) * 2));
-            this.vertices[i+2] = this.verticesOrig[i+2] + (1 - (this.p5.noise(this.verticesOrig[i+2] + this.increment) * 2));
+            this.vertices[i] = this.verticesOrig[i] + (2 - (this.p5.noise((this.verticesOrig[i] + this.increment)/smoothing) * 4));
+            this.vertices[i+1] = this.verticesOrig[i+1] + (2 - (this.p5.noise((this.verticesOrig[i+1] + this.increment)/smoothing) * 4));
+            this.vertices[i+2] = this.verticesOrig[i+2] + (2 - (this.p5.noise((this.verticesOrig[i+2] + this.increment)/smoothing) * 4));
 
         }
 
-        this.increment += 0.08;
+        this.increment += 0.3;
         this.mesh.geometry.attributes.position.needsUpdate = true;
         this.mesh.geometry.computeVertexNormals();
     }

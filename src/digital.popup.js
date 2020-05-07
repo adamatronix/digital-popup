@@ -56,7 +56,7 @@ class DigitalPopup {
 
         this.scene.background = new THREE.Color( 0xFFFFFF );
 
-        this.sphere = new NoiseSphere({ scene: this.scene });
+        this.spheres = [];
 
         // set up the options for a perspective camera
         const fov = 35; // fov = Field Of View
@@ -139,6 +139,7 @@ class DigitalPopup {
         this.camControls.addEventListener( 'unlock', this.onInstructionsUnlock);
         this.addRandomBlocks();
         this.addPillars();
+        this.addRandomSpheres();
 
 
         var ceilLight = new THREE.Mesh( new THREE.PlaneGeometry( 10, 10, 4, 4 ), new THREE.MeshStandardMaterial({
@@ -315,6 +316,18 @@ class DigitalPopup {
         
     }
 
+    addRandomSpheres() {
+
+        for(var i = 0; i < 9; i++) {
+            let sphere = new NoiseSphere({ size: this.random( 2, 5), detail: 2, color: 0xFED7D6 });
+            sphere.circle.position.set(this.random( -40, 40),this.random( 0, 40),this.random( -40, 40));
+            this.spheres.push(sphere);
+            this.scene.add(sphere.circle);
+        }
+
+        
+    }
+
     addPillars() {
         var geometryCylinder = new THREE.CylinderBufferGeometry( 2, 2, 40, 32 );
         var materialCylinder = new THREE.MeshPhongMaterial( {color: 0xffffff} );
@@ -417,7 +430,11 @@ class DigitalPopup {
         this.stats.begin();
         this.camControls.update();
         this.meshWall1.update();
-        this.sphere.update();
+
+        this.spheres.forEach(function(sphere){
+            sphere.update();
+        });
+        
     
         //console.log(this.detectPlayerCollision());
     
