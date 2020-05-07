@@ -279,21 +279,43 @@ class DigitalPopup {
 
         const ambientLight = new THREE.AmbientLight( 0xffffff, 0.92);
         // remember to add the light to the scene
-        this.scene.add( ambientLight );
+        //this.scene.add( ambientLight );
 
         // Create a directional light
         
-        this.light = new THREE.PointLight( 0xffffff, 0.2, 120 );
+        this.light = new THREE.PointLight( 0xffffff, 0.8, 120 );
         this.light.castShadow = true;
         this.light.shadow.camera.near = 0.1;
         this.light.shadow.camera.far = 300;
         this.light.shadow.mapSize.width = 1024;
         this.light.shadow.mapSize.height = 1024;
         // move the light back and up a bit
-        this.light.position.set( 0, 60, -30 );
+        this.light.position.set( -30, 90, -30 );
 
         // remember to add the light to the scene
         this.scene.add( this.light );
+
+        this.light2 = new THREE.PointLight( 0xffffff, 0.4, 120 );
+        this.light2.castShadow = true;
+        this.light2.shadow.camera.near = 0.1;
+        this.light2.shadow.camera.far = 300;
+        this.light2.shadow.mapSize.width = 1024;
+        this.light2.shadow.mapSize.height = 1024;
+        // move the light back and up a bit
+        this.light2.position.set( 30, 90, 30 );
+
+        // remember to add the light to the scene
+        this.scene.add( this.light2 );
+
+
+        let hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.9 );
+        hemiLight.color.setHex(0xFFDCEC);
+        hemiLight.groundColor.setHex(0xFFFFFF);
+        hemiLight.position.set( 0, 200, 0 );
+        this.scene.add( hemiLight );
+
+        let hemiLightHelper = new THREE.HemisphereLightHelper( hemiLight, 10 );
+        this.scene.add( hemiLightHelper );
 
         // create a WebGLRenderer and set its width and height
         this.renderer = new THREE.WebGLRenderer( { antialias: true } );
