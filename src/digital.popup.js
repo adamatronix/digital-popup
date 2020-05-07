@@ -147,7 +147,9 @@ class DigitalPopup {
                 }
 
             } );
-            object.scale.set(0.3,0.3,0.3);
+            object.scale.set(0.52,0.52,0.52);
+            object.position.z = -20;
+            object.position.x = -10;
             self.scene.add( object );
 
         } );
@@ -171,6 +173,7 @@ class DigitalPopup {
         this.addRandomBlocks();
         this.addPillars();
         this.addRandomSpheres();
+        this.initSkydome();
 
 
         var ceilLight = new THREE.Mesh( new THREE.PlaneGeometry( 10, 10, 4, 4 ), new THREE.MeshStandardMaterial({
@@ -237,7 +240,7 @@ class DigitalPopup {
         meshCeil.rotation.x += Math.PI / 2;
 
         meshCeil.position.y = 40;
-	   // Floor can have shadows cast onto it
+	   // Floor can have shadows cast onto it 
 	    meshCeil.receiveShadow = true;
         // add the mesh to the scene object
         //this.scene.add( meshCeil );
@@ -306,6 +309,62 @@ class DigitalPopup {
         container.appendChild( this.renderer.domElement );
 
         //this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+    }
+
+    getVertexShader() {
+
+        return `
+            varying vec3 vWorldPosition;
+
+            void main() {
+
+                vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+                vWorldPosition = worldPosition.xyz;
+
+                gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+            }    
+        `
+    }
+
+    getFragmentShader() {
+        return `
+            uniform vec3 topColor;
+            uniform vec3 bottomColor;
+            uniform float offset;
+            uniform float exponent;
+
+            varying vec3 vWorldPosition;
+
+            void main() {
+
+                float h = normalize( vWorldPosition + offset ).y;
+                gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( max( h , 0.0), exponent ), 0.0 ) ), 1.0 );
+
+            }
+        `
+    }
+
+    initSkydome() {
+        var vertexShader = this.getVertexShader();
+        var fragmentShader = this.getFragmentShader();
+        var uniforms = {
+            "topColor": { value: new THREE.Color( 0xFFA9C3 ) },
+            "bottomColor": { value: new THREE.Color( 0xAEDFE8 ) },
+            "offset": { value: 60 },
+            "exponent": { value: 1 }
+        };
+
+        var skyGeo = new THREE.SphereBufferGeometry( 200, 32, 15 );
+        var skyMat = new THREE.ShaderMaterial( {
+            uniforms: uniforms,
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader,
+            side: THREE.BackSide
+        } );
+
+        var sky = new THREE.Mesh( skyGeo, skyMat );
+        this.scene.add( sky );
     }
 
     onInstructionsClick() {
