@@ -9,7 +9,7 @@ class Block {
 
     createMesh() {
         let height = 4;
-        const geometry = new THREE.BoxBufferGeometry( this.options.width, this.options.height, this.options.depth );
+        const geometry = new THREE.BoxBufferGeometry( this.options.width, this.options.height, this.options.depth, 1, 1, 1 );
         
         // create a Mesh containing the geometry and material
         let mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({color:0xffffff}) );
