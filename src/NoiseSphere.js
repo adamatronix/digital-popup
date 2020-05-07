@@ -26,7 +26,7 @@ class NoiseSphere {
         const geometry = new THREE.IcosahedronBufferGeometry(this.options.size, this.options.detail);
         // create a Mesh containing the geometry and material
         this.mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial({ color: this.options.color, side: THREE.DoubleSide, shading: THREE.FlatShading} ));
-        this.mesh.receiveShadow = true;
+        //this.mesh.receiveShadow = true;
         this.mesh.castShadow = true;
 
         return this.mesh;
@@ -53,9 +53,9 @@ class NoiseSphere {
 
         for (var i = 0; i <= this.vertices.length; i += 3) {
 
-            this.vertices[i] = this.verticesOrig[i] + (2 - (this.p5.noise((this.verticesOrig[i] + this.increment)/smoothing) * 4));
-            this.vertices[i+1] = this.verticesOrig[i+1] + (2 - (this.p5.noise((this.verticesOrig[i+1] + this.increment)/smoothing) * 4));
-            this.vertices[i+2] = this.verticesOrig[i+2] + (2 - (this.p5.noise((this.verticesOrig[i+2] + this.increment)/smoothing) * 4));
+            this.vertices[i] = this.verticesOrig[i] + (4 - (this.p5.noise((this.verticesOrig[i] + this.increment)/smoothing) * 8));
+            this.vertices[i+1] = this.verticesOrig[i+1] + (4 - (this.p5.noise((this.verticesOrig[i+1] + this.increment)/smoothing) * 8));
+            this.vertices[i+2] = this.verticesOrig[i+2] + (4 - (this.p5.noise((this.verticesOrig[i+2] + this.increment)/smoothing) * 8));
 
         }
 

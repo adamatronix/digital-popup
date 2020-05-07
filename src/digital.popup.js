@@ -2,6 +2,7 @@ import * as THREE from "three";
 import p5 from "p5";
 import { Water } from 'three/examples/jsm/objects/Water2';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import NaturalMovementControls from './NaturalMovementControls';
 import Block from "./block";
@@ -11,6 +12,7 @@ import waterMap1 from "./Water_1_M_Normal.jpg";
 import waterMap2 from "./Water_2_M_Normal.jpg";
 import shirt from "./Tshirt_obj.obj";
 import raptor from "./raptor_01.obj";
+import dancer from "./Dancing.fbx";
 import image1 from "./image1.jpg";
 import image2 from "./image2.jpg";
 import Product from "./product";
@@ -121,6 +123,35 @@ class DigitalPopup {
             }
         );
 
+        this.clock = new THREE.Clock();
+        this.mixer = null;
+
+        this.loader3 = new FBXLoader();
+        this.loader3.load( dancer, function ( object ) {
+
+            self.mixer = new THREE.AnimationMixer( object );
+
+            var action = self.mixer.clipAction( object.animations[ 0 ] );
+            action.play();
+
+            object.traverse( function ( child ) {
+
+                if ( child.isMesh ) {
+
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                    child.material.map = null;
+                    child.material.color.setHex( 0xffffff );
+                    console.log(child.material);
+
+                }
+
+            } );
+            object.scale.set(0.3,0.3,0.3);
+            self.scene.add( object );
+
+        } );
+
         this.camera = new THREE.PerspectiveCamera( fov, aspect, near, far );
 
         this.raycaster = new THREE.Raycaster();
@@ -150,7 +181,7 @@ class DigitalPopup {
           }) );
         ceilLight.position.y = 39;
         ceilLight.rotation.x += Math.PI / 2;
-        this.scene.add(ceilLight);
+        //this.scene.add(ceilLight);
 
         var productMesh = new Product({
             width: 20,
@@ -209,7 +240,7 @@ class DigitalPopup {
 	   // Floor can have shadows cast onto it
 	    meshCeil.receiveShadow = true;
         // add the mesh to the scene object
-        this.scene.add( meshCeil );
+        //this.scene.add( meshCeil );
 
         this.meshWall1 = new NoiseWall({
             width: 100,
@@ -318,9 +349,9 @@ class DigitalPopup {
 
     addRandomSpheres() {
 
-        for(var i = 0; i < 9; i++) {
-            let sphere = new NoiseSphere({ size: this.random( 2, 5), detail: 2, color: 0xFED7D6 });
-            sphere.circle.position.set(this.random( -40, 40),this.random( 0, 40),this.random( -40, 40));
+        for(var i = 0; i < 4; i++) {
+            let sphere = new NoiseSphere({ size: this.random( 2, 5), detail: 2, color: 0xFFFFFF });
+            sphere.circle.position.set(this.random( -5, 5),this.random( 5, 10),this.random( -5, 5));
             this.spheres.push(sphere);
             this.scene.add(sphere.circle);
         }
@@ -434,6 +465,10 @@ class DigitalPopup {
         this.spheres.forEach(function(sphere){
             sphere.update();
         });
+
+        var delta = this.clock.getDelta();
+
+	    if ( this.mixer ) this.mixer.update( delta );
         
     
         //console.log(this.detectPlayerCollision());

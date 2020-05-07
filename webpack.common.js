@@ -36,7 +36,7 @@ module.exports = {
           ]
         },
         {
-          test: /\.obj$/,
+          test: /\.(obj|fbx)$/,
           loader: 'url-loader'
         }
     ]
