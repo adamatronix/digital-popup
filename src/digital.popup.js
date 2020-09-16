@@ -1,10 +1,10 @@
 import * as THREE from "three";
 import p5 from "p5";
+import NaturalMovementControls from '@adamatronix/natural-movement-controls/src';
 import { Water } from 'three/examples/jsm/objects/Water2';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
-import NaturalMovementControls from './NaturalMovementControls';
 import Block from "./block";
 import NoiseWall from './NoiseWall';
 import NoiseSphere from './NoiseSphere';
@@ -64,7 +64,7 @@ class DigitalPopup {
         const fov = 35; // fov = Field Of View
         const aspect = container.clientWidth / container.clientHeight;
         const near = 0.1;
-        const far = 300;
+        const far = 600;
 
         this.loader = new OBJLoader();
 
