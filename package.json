@@ -19,7 +19,6 @@
     "css-loader": "^3.5.2",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^4.5.2",
-    "node-sass": "^4.13.1",
     "sass-loader": "^8.0.2",
     "style-loader": "^1.1.4",
     "terser-webpack-plugin": "^2.3.5",
@@ -33,6 +32,7 @@
   "dependencies": {
     "@adamatronix/natural-movement-controls": "^1.0.1",
     "p5": "^1.0.0",
+    "sass": "^1.50.1",
     "three": "^0.115.0"
   }
 }
